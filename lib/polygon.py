@@ -24,18 +24,6 @@ class Polygon:
             result.append([position.x, position.y])
         return result
 
-    def setPosition(self, position: vec.Vector):
-        self.position = position
-
-    def setVelocity(self, velocity: vec.Vector):
-        self.velocity = velocity
-
-    def setAngle(self, angle: float):
-        self.angle = angle
-
-    def setAngular(self, angular: float):
-        self.angular = angular
-
     def update(self, deltaTime: float, gravity: float):
         self.velocity = self.velocity.add(vec.Vector(0, -gravity * deltaTime, 0))
         self.position = self.position.add(self.velocity.scale(deltaTime))
