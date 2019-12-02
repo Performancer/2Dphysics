@@ -1,102 +1,32 @@
 import lib.vector as vec
 import lib.polygon as pol
-import math
+from matplotlib import pyplot
+from matplotlib import animation
 
-a = vec.Vector(3, 4, 0)
-b = vec.Vector(2, 8, 0)
+pola = pol.Polygon(1, 0, 8, 1)
+pola.position = vec.Vector(5,5,0)
 
-norm = a.normalize()
-print('normalize: ' + str(norm.x) + ' ' + str(norm.y) + ' ' + str(norm.z) )
+fig = pyplot.figure()
+fig.set_dpi(100)
+fig.set_size_inches(7, 6.5)
 
-mag = a.magnitude()
-print('magnitude: ' + str(mag))
+ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
-add = a.add(b)
-print('add: ' + str(add.x) + ' ' + str(add.y) )
+points = pola.getVertices()
+patch = pyplot.Polygon(pola.getVertices())
 
-sub = a.subtract(b)
-print('subtract: ' + str(sub.x) + ' ' + str(sub.y))
+def init():
+    ax.add_patch(patch)
+    return patch,
 
-dot = a.dot(b)
-print('dot ' + str(dot))
+def animate(i):
+    pola.update(20 / 1000, 9.81)
+    patch.set_xy(pola.getVertices())
+    return patch,
 
-scale = a.scale(10)
-print('scale ' + str(scale.x) + ' ' + str(scale.y))
+anim = animation.FuncAnimation(fig, animate, 
+                               init_func=init, 
+                               interval=20,
+                               blit=True)
 
-cross = a.cross(b)
-print('cross: ' + str(cross.x) + ' ' + str(cross.y) + ' ' + str(cross.z))
-
-
-pola = pol.Polygon(1, 0, 4, 1)
-polb = pol.Polygon(1, 0, 3, 1)
-polc = pol.Polygon(1, 0, 5, 1)
-
-print('vertices in polygon a (4 vertices): \n\tfirst: ' + 
-                                str(round(pola.vertices[0].x, 2)) + ' ' + 
-                                str(round(pola.vertices[0].y, 2)) + ' ' + 
-                                str(round(pola.vertices[0].z, 2)) + 
-                                '\n\tsecond: ' + 
-                                str(round(pola.vertices[1].x, 2)) + ' ' + 
-                                str(round(pola.vertices[1].y, 2)) + ' ' + 
-                                str(round(pola.vertices[1].z, 2)) +
-                                '\n\tthird: '  + 
-                                str(round(pola.vertices[2].x, 2)) + ' ' +
-                                str(round(pola.vertices[2].y, 2)) + ' ' +
-                                str(round(pola.vertices[2].z, 2)) +
-                                '\n\tfourth: ' + 
-                                str(round(pola.vertices[3].x, 2)) + ' ' +
-                                str(round(pola.vertices[3].y, 2)) + ' ' +
-                                str(round(pola.vertices[3].z, 2)))
-
-print('vertices in polygon b (3 vertices): \n\tfirst: ' + 
-                                str(round(polb.vertices[0].x, 2)) + ' ' + 
-                                str(round(polb.vertices[0].y, 2)) + ' ' + 
-                                str(round(polb.vertices[0].z, 2)) + 
-                                '\n\tsecond: ' + 
-                                str(round(polb.vertices[1].x, 2)) + ' ' + 
-                                str(round(polb.vertices[1].y, 2)) + ' ' + 
-                                str(round(polb.vertices[1].z, 2)) +
-                                '\n\tthird: '  + 
-                                str(round(polb.vertices[2].x, 2)) + ' ' +
-                                str(round(polb.vertices[2].y, 2)) + ' ' +
-                                str(round(polb.vertices[2].z, 2)))
-                                
-
-print('vertices in polygon c (5 vertices): \n\tfirst: ' + 
-                                str(round(polc.vertices[0].x, 2)) + ' ' + 
-                                str(round(polc.vertices[0].y, 2)) + ' ' + 
-                                str(round(polc.vertices[0].z, 2)) + 
-                                '\n\tsecond: ' + 
-                                str(round(polc.vertices[1].x, 2)) + ' ' + 
-                                str(round(polc.vertices[1].y, 2)) + ' ' + 
-                                str(round(polc.vertices[1].z, 2)) +
-                                '\n\tthird: '  + 
-                                str(round(polc.vertices[2].x, 2)) + ' ' +
-                                str(round(polc.vertices[2].y, 2)) + ' ' +
-                                str(round(polc.vertices[2].z, 2)) +
-                                '\n\tfourth: ' + 
-                                str(round(polc.vertices[3].x, 2)) + ' ' +
-                                str(round(polc.vertices[3].y, 2)) + ' ' +
-                                str(round(polc.vertices[3].z, 2)) +
-                                '\n\tfifth: ' + 
-                                str(round(polc.vertices[4].x, 2)) + ' ' +
-                                str(round(polc.vertices[4].y, 2)) + ' ' +
-                                str(round(polc.vertices[4].z, 2)))
-
-
-print('velocity test')
-pola.position = vec.Vector(0,0,0)
-pola.velocity = vec.Vector(0,0,0)
-pola.angle = 0
-pola.angular = 0
-print(str(pola.position.x) + ' ' + str(pola.position.y))
-pola.update(10, -9.81)
-print(str(pola.position.x) + ' ' + str(pola.position.y))
-
-
-newpola = pola.getVertices()
-
-print(str(newpola[0]))
-print(str(newpola[1]))
-print(str(newpola[2]))
-print(str(newpola[3]))
+pyplot.show()

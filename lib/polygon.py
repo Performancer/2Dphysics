@@ -18,11 +18,10 @@ class Polygon:
             self.vertices.append(vec.Vector(-math.sin(angle * i), math.cos(angle * i), 0.0).scale(self.radius))
 
     def getVertices(self) -> []:
-        newVertices = []
         result = []
         for i in range(0, len(self.vertices)):
-            newVertices.append(self.vertices[i].subtract(self.position).rotate(self.angle).add(self.position))
-            result.append([self.vertices[i].x, self.vertices[i].y, self.vertices[i].z])
+            position = self.vertices[i].rotate(self.angle).add(self.position)
+            result.append([position.x, position.y])
         return result
 
     def setPosition(self, position: vec.Vector):
