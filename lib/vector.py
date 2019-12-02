@@ -7,7 +7,7 @@ class Vector:
         self.z = z
 
     def add(self, other: 'Vector') -> 'Vector':
-        return self
+        return Vector(self.x + other.x, self.y + other.y, self.z + other.z)
 
     def subtract(self, other: 'Vector') -> 'Vector':
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
@@ -24,7 +24,7 @@ class Vector:
         return Vector(self.x * scalar, self.y * scalar, self.z * scalar)
 
     def normalize(self) -> 'Vector':
-        return self
+        return self.scale(1/self.magnitude())
 
-    def magnitude(self, other: 'Vector') -> float:
-        return (math.sqrt (self.x**2 + self.y**2 + self.z**2) )
+    def magnitude(self) -> float:
+        return math.sqrt (self.x**2 + self.y**2 + self.z**2)

@@ -4,8 +4,14 @@ import lib.polygon as pol
 a = vec.Vector(3, 4, 0)
 b = vec.Vector(2, 8, 0)
 
-mag = a.magnitude(b)
+norm = a.normalize()
+print('normalize: ' + str(norm.x) + ' ' + str(norm.y) + ' ' + str(norm.z) )
+
+mag = a.magnitude()
 print('magnitude: ' + str(mag))
+
+add = a.add(b)
+print('add: ' + str(add.x) + ' ' + str(add.y) )
 
 sub = a.subtract(b)
 print('subtract: ' + str(sub.x) + ' ' + str(sub.y))
