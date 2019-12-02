@@ -72,3 +72,13 @@ print('vertices in polygon c (5 vertices): \n\tfirst: ' +
                                 str(round(polc.vertices[4].x, 2)) + ' ' +
                                 str(round(polc.vertices[4].y, 2)) + ' ' +
                                 str(round(polc.vertices[4].z, 2)))
+
+
+print('velocity test')
+pola.position = vec.Vector(0,0,0)
+pola.velocity = vec.Vector(0,0,0)
+pola.angle = 0
+pola.angular = 0
+print(str(pola.position.x) + ' ' + str(pola.position.y));
+pola.update(10, -9.81)
+print(str(pola.position.x) + ' ' + str(pola.position.y));

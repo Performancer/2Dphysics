@@ -25,11 +25,10 @@ class Polygon:
     def setAngular(self, angular: float):
         self.angular = angular
 
-    def update(self, deltaTime: float):
-        return
-
-    def draw(self):
-        return
+    def update(self, deltaTime: float, gravity: float):
+        self.velocity = self.velocity.add(vec.Vector(0, -gravity * deltaTime, 0))
+        self.position = self.position.add(self.velocity.scale(deltaTime))
+        self.angle = self.angle + self.angular * deltaTime
 
     def collidesWithOther(self, other: 'Polygon') -> bool:
         return False
