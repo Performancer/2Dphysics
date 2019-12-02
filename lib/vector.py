@@ -17,7 +17,7 @@ class Vector:
         return self
 
     def scale(self, scalar: float) -> 'Vector':
-        return self
+        return Vector(self.x * scalar, self.y * scalar)
 
     def normalize(self) -> 'Vector':
         return self
