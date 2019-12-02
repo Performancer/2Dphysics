@@ -1,3 +1,4 @@
+import math
 
 class Vector:
     def __init__(self, x: float, y: float, z: float):
@@ -25,5 +26,5 @@ class Vector:
     def normalize(self) -> 'Vector':
         return self
 
-    def magnitude(self) -> float:
-        return 0
+    def magnitude(self, other: 'Vector') -> float:
+        return (math.sqrt (self.x**2 + self.y**2 + self.z**2) )
