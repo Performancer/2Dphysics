@@ -12,3 +12,6 @@ print('dot ' + str(dot))
 
 scale = a.scale(10)
 print('scale ' + str(scale.x) + ' ' + str(scale.y))
+
+cross = a.cross(b)
+print('cross: ' + str(cross.x) + ' ' + str(cross.y) + ' ' + str(cross.z))
