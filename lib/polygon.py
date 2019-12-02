@@ -13,6 +13,13 @@ class Polygon:
         for i in range(0, count):
             self.vertices.append(vec.Vector(-math.sin(angle * i), math.cos(angle * i), 0.0).scale(self.radius))
 
+    def rotate(self, angle: float) -> []:
+        newVertices = []
+        for i in range(len(self.vertices)):
+            newVertices.append([math.cos(angle) * self.vertices[i].x - math.sin(angle) * self.vertices[i].y, 
+                                math.sin(angle) * self.vertices[i].x + math.cos(angle) * self.vertices[i].y, 0]) 
+        return newVertices
+
     def setPosition(self, position: vec.Vector):
         self.position = position
 

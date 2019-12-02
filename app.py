@@ -1,5 +1,6 @@
 import lib.vector as vec
 import lib.polygon as pol
+import math
 
 a = vec.Vector(3, 4, 0)
 b = vec.Vector(2, 8, 0)
@@ -82,6 +83,14 @@ pola.position = vec.Vector(0,0,0)
 pola.velocity = vec.Vector(0,0,0)
 pola.angle = 0
 pola.angular = 0
-print(str(pola.position.x) + ' ' + str(pola.position.y));
+print(str(pola.position.x) + ' ' + str(pola.position.y))
 pola.update(10, -9.81)
-print(str(pola.position.x) + ' ' + str(pola.position.y));
+print(str(pola.position.x) + ' ' + str(pola.position.y))
+
+
+newpola = pola.rotate(math.pi/2)
+
+print(str(newpola[0]))
+print(str(newpola[1]))
+print(str(newpola[2]))
+print(str(newpola[3]))
