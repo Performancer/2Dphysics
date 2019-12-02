@@ -15,7 +15,7 @@ class Polygon:
     def locateVertices(self, count: int):
         angle = 2.0 * math.pi / count
         for i in range(0, count):
-            self.vertices.append(vec.Vector(-math.sin(angle * i), math.cos(angle * i), 0.0).scale(self.radius))
+            self.vertices.append(vec.Vector(0, self.radius, 0).rotate(angle * i))
 
     def getVertices(self) -> []:
         result = []
