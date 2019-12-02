@@ -4,6 +4,9 @@ import lib.polygon as pol
 a = vec.Vector(3, 4, 0)
 b = vec.Vector(2, 8, 0)
 
+mag = a.magnitude(b)
+print('magnitude: ' + str(mag))
+
 sub = a.subtract(b)
 print('subtract: ' + str(sub.x) + ' ' + str(sub.y))
 
