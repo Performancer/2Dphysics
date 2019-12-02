@@ -1,20 +1,17 @@
 import lib.vector as vec
 import math
 class Polygon:
-    def __init__(self, mass: float, inertia: float, amountOfVertices: int, radius: float):
+    def __init__(self, mass: float, inertia: float, vertices: int, radius: float):
         self.mass = mass
         self.inertia = inertia
-        self.amountOfVertices = amountOfVertices
         self.radius = radius
         self.vertices = []
-        self.locateVertices(amountOfVertices)   
+        self.locateVertices(vertices)   
 
     def locateVertices(self, count: int):
-        angle = 2.0 * math.pi / self.amountOfVertices
+        angle = 2.0 * math.pi / count
         for i in range(0, count):
-            self.vertices.append(vec.Vector(
-                - math.sin(angle * i), 
-                math.cos(angle * i), 0.0).scale(self.radius))
+            self.vertices.append(vec.Vector(-math.sin(angle * i), math.cos(angle * i), 0.0).scale(self.radius))
 
     def setPosition(self, position: vec.Vector):
         self.position = position
