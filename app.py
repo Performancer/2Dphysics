@@ -94,7 +94,7 @@ pola.update(10, -9.81)
 print(str(pola.position.x) + ' ' + str(pola.position.y))
 
 
-newpola = pola.rotate(math.pi/2)
+newpola = pola.getVertices()
 
 print(str(newpola[0]))
 print(str(newpola[1]))

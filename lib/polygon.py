@@ -7,18 +7,23 @@ class Polygon:
         self.radius = radius
         self.vertices = []
         self.locateVertices(vertices)   
+        self.position = vec.Vector(0,0,0)
+        self.velocity = vec.Vector(0,0,0)
+        self.angle = 0
+        self.angular = 0
 
     def locateVertices(self, count: int):
         angle = 2.0 * math.pi / count
         for i in range(0, count):
             self.vertices.append(vec.Vector(-math.sin(angle * i), math.cos(angle * i), 0.0).scale(self.radius))
 
-    def rotate(self, angle: float) -> []:
+    def getVertices(self) -> []:
         newVertices = []
-        for i in range(len(self.vertices)):
-            newVertices.append([math.cos(angle) * self.vertices[i].x - math.sin(angle) * self.vertices[i].y, 
-                                math.sin(angle) * self.vertices[i].x + math.cos(angle) * self.vertices[i].y, 0]) 
-        return newVertices
+        result = []
+        for i in range(0, len(self.vertices)):
+            newVertices.append(self.vertices[i].subtract(self.position).rotate(self.angle).add(self.position))
+            result.append([self.vertices[i].x, self.vertices[i].y, self.vertices[i].z])
+        return result
 
     def setPosition(self, position: vec.Vector):
         self.position = position

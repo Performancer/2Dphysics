@@ -28,3 +28,7 @@ class Vector:
 
     def magnitude(self) -> float:
         return math.sqrt (self.x**2 + self.y**2 + self.z**2)
+
+    def rotate(self, angle: float) -> 'Vector':
+        return Vector(math.cos(angle) * self.x - math.sin(angle) * self.y,
+                        math.sin(angle) * self.x + math.cos(angle) * self.y, 0)
