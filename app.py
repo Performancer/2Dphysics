@@ -4,35 +4,47 @@ import lib.polygon as pol
 from matplotlib import pyplot
 from matplotlib import animation
 
-pola = pol.Polygon(1, 0, 4, 1)
-polb = pol.Polygon(3, 1, 4, 1)
-polb.position = vec.Vector(-4,-4,0)
-pola.position = vec.Vector(5,5,0)
-print('Collision?: ' + str(pola.CollidesWithOtherPolygon(polb)))
+polygons = []
+
+polygons.append(pol.Polygon(1, 0, 4, 2))
+polygons[0].position = vec.Vector(3,5,0)
+polygons[0].angular = 5
+polygons.append(pol.Polygon(3, 1, 4, 2))
+polygons[1].position = vec.Vector(7,5,0)
+polygons[1].angular = -5
+
+print('Collision?: ' + str(polygons[0].CollidesWithOtherPolygon(polygons[1])))
+
 fig = pyplot.figure()
 fig.set_dpi(100)
 fig.set_size_inches(7, 6.5)
 
 ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
-points = pola.getVertices()
-patch = pyplot.Polygon(pola.getVertices())
+patches = []
+patches.append(pyplot.Polygon(polygons[0].getVertices()))
+patches.append(pyplot.Polygon(polygons[1].getVertices()))
 
 def init():
-    ax.add_patch(patch)
-    return patch,
+    ax.add_patch(patches[0])
+    ax.add_patch(patches[1])
+    return []
 
-def animate(i):
-    pola.update(20 / 1000, 9.81)
-    pola.angular += 0.1
-    patch.set_xy(pola.getVertices())
-    return patch,
+def animate(i, square, triangle):
+    polygons[0].update(20 / 1000, 9.81)
+    polygons[1].update(20 / 1000, 9.81)
 
+    patches[0].set_xy(polygons[0].getVertices())
+    patches[1].set_xy(polygons[1].getVertices())
+    return []
 
 
 anim = animation.FuncAnimation(fig, animate, 
-                               init_func=init, 
+                               init_func=init,
+                               frames=1,
+                               fargs=(patches[0], patches[1],),
                                interval=20,
-                               blit=True)
+                               blit=True,
+                               repeat=True)
 
 pyplot.show()
