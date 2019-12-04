@@ -20,7 +20,7 @@ fig.set_size_inches(7, 6.5)
 
 ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
-circle = pyplot.Circle((0, 0), 0.1, color='r')
+circle = pyplot.Circle((-1, -1), 0.1, color='r')
 
 patches = []
 patches.append(pyplot.Polygon(polygons[0].getVertexArray()))
