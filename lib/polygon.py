@@ -87,39 +87,41 @@ class Polygon:
                            
         return False
 
-    def findClosest(self, other: 'Polygon') -> vec.Vector:
+    def findCollision(self, other: 'Polygon') -> vec.Vector:
         shortestD = (99999, vec.Vector(0,0,0), vec.Vector(0,0,0))
         otherVerts = other.getVertices()
         selfVerts = self.getVertices()
+        
         for i in range(0, len(selfVerts)):
             for u in range(0, len(otherVerts)):
                 uNext = (u + 1) % len(otherVerts)
                 edge = otherVerts[uNext] - otherVerts[u]
+                
                 numerator = math.fabs((edge.x * (selfVerts[i].y - otherVerts[u].y)) - edge.y * (selfVerts[i].x - otherVerts[u].x))
-                denomirator = math.sqrt(math.pow(edge.x, 2) + math.pow(edge.y, 2))
-                d = numerator/denomirator
-                if(d < shortestD[0]):
-                    shortestD = (d, selfVerts[i], otherVerts[uNext] - otherVerts[u])
+                denomirator = math.sqrt(edge.x**2 + edge.y**2)
+                distance = numerator/denomirator
+                
+                if(distance < shortestD[0]):
+                    shortestD = (distance, selfVerts[i], edge)
+                    
         return (shortestD[1], shortestD[2])
 
     def onCollision(self, other: 'Polygon'):
-        data = self.findClosest(other)
+        data = self.findCollision(other)
         collision = data[0]
         edge = data[1]
-
+        
         normal = self.getNormal(edge)
 
         rA = collision - self.position
         rB = collision - other.position
         VAB = self.velocity + (vec.Vector(0, 0, self.angular).cross(rA)) - other.velocity + (vec.Vector(0, 0, other.angular).cross(rB))
 
-        e = 1
-        I = -(e + 1) * (VAB.dot(normal)
-           / ( 1/self.mass + (rA.cross(normal).magnitude()**2)/self.inertia
-              + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inertia))
+        e = 0.8 #maybe this could be parameter
+        impulse = -(e + 1) * (VAB.dot(normal) / ( 1/self.mass + (rA.cross(normal).magnitude()**2)/self.inertia + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inertia))
 
-        self.velocity += normal.scale(I/self.mass)
-        self.angular += I/self.inertia * rA.cross(normal).z
+        self.velocity += normal.scale(impulse/self.mass)
+        self.angular += impulse/self.inertia * rA.cross(normal).z
         
-        other.velocity += normal.scale(I/other.mass)
-        other.angular += I/other.inertia * rB.cross(normal).z
+        other.velocity -= normal.scale(impulse/other.mass)
+        other.angular -= impulse/other.inertia * rB.cross(normal).z

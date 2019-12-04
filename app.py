@@ -10,10 +10,8 @@ polygons.append(pol.Polygon(1, 1, 4, 2))
 polygons[0].position = vec.Vector(2,5,0)
 polygons[0].velocity = vec.Vector(10,0,0)
 
-
-polygons.append(pol.Polygon(8, 1, 3, 2))
+polygons.append(pol.Polygon(1, 1, 3, 2))
 polygons[1].position = vec.Vector(8,5,0)
-
 
 fig = pyplot.figure()
 fig.set_dpi(100)
