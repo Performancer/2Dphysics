@@ -10,12 +10,12 @@ class Polygon:
         self.velocity = vec.Vector(0,0,0)
         self.angle = 0
         self.angular = 0
-        self.vertices = []
-                
+                 
         self.locateVertices(vertices, radius)  
 
     #locates the vertices in an even distance
     def locateVertices(self, count: int, radius: float):
+        self.vertices = []
         angle = 2.0 * math.pi / count
         for i in range(0, count):
             self.vertices.append(vec.Vector(0, radius, 0).rotate(angle * i))
@@ -56,7 +56,7 @@ class Polygon:
             if length < lowest:
                 lowest = length
 
-        return (highest, lowest)
+        return {'highest': highest, 'lowest': lowest}
 
     #checks if the polygon collides with another polygon
     def collides(self, other: 'Polygon') -> bool:
@@ -65,53 +65,49 @@ class Polygon:
             sProj = self.getProjections(normal)
             oProj = other.getProjections(normal)
                         
-            if oProj[0] - sProj[1] > 0 and oProj[1] - sProj[0] > 0:
+            if oProj['highest'] - sProj['lowest'] > 0 and oProj['lowest'] - sProj['highest'] > 0:
                 return False
-            if oProj[0] - sProj[1] < 0 and oProj[1] - sProj[0] < 0:
+            if oProj['highest'] - sProj['lowest'] < 0 and oProj['lowest'] - sProj['highest'] < 0:
                 return False
                 
         return True
 
     #gets the distance from a point to a line
-    def getDistance(self, point: vec.Vector, start: vec.Vector, end: vec.Vector) -> float:
-        sp = start - point #vector from point to start of line
-        n = (end - start).normalize() #normalized line
-        
+    def getDistance(self, point: vec.Vector, start: vec.Vector, line: vec.Vector) -> float:
+        sp = start - point
+        n = line.normalize()    
         #FORMULA: d = |(s-p) - ((s-p) dot n)n|
         return (sp - n.scale(sp.dot(n))).magnitude()
 
     #gets the vertice and the edge of the collision contact point
     def findCollision(self, other: 'Polygon') -> vec.Vector:
-        shortest = sys.float_info.max
-        vertex = vec.Vector(0,0,0)
-        edge = vec.Vector(0,0,0)
+        data = {'distance': sys.float_info.max, 'vertex': vec.Vector(0,0,0), 'edge': vec.Vector(0,0,0)}
         
         for i in range(0, len(self.vertices)):
+            start = self.getVertex(i)
+            edge = self.getVertex((i+1) % len(self.vertices)) - start
             for j in range(0, len(other.vertices)):
-                distance = self.getDistance(self.getVertex(i), other.getVertex(j), other.getVertex((j+1) % len(other.vertices)))
+                vertex = other.getVertex(j)
+                distance = self.getDistance(vertex, start, edge)
                 
-                if(distance < shortest):
-                    shortest = distance
-                    vertex = self.getVertex(i)
-                    edge = other.getVertex((j + 1) % len(other.vertices)) - other.getVertex(j)
-
-                distance = self.getDistance(other.getVertex(j), self.getVertex(i), self.getVertex((i+1) % len(self.vertices)))
-
-                if(distance < shortest):
-                    shortest = distance
-                    vertex = other.getVertex(j)
-                    edge = self.getVertex((i + 1) % len(self.vertices)) - self.getVertex(i)
+                if(distance < data['distance']):
+                    data = {'distance': distance, 'vertex': vertex, 'edge': edge}
                               
-        return (vertex, self.getNormal(edge))
+        return data
 
     #handles collision between two polygons
     def onCollision(self, other: 'Polygon') -> vec.Vector:
         data = self.findCollision(other)
-        collision = data[0]
-        normal = data[1]
+        alternative = other.findCollision(self)
 
-        rA = collision - self.position
-        rB = collision - other.position
+        if alternative['distance'] < data['distance']:
+           data = alternative
+
+        contact = data['vertex']
+        normal = self.getNormal(data['edge'])
+        
+        rA = contact - self.position
+        rB = contact - other.position
         VAB = self.velocity + (vec.Vector(0, 0, self.angular).cross(rA)) - other.velocity + (vec.Vector(0, 0, other.angular).cross(rB))
 
         e = 0.8 #maybe this could be parameter
@@ -123,7 +119,7 @@ class Polygon:
         other.velocity -= normal.scale(impulse/other.mass)
         other.angular -= impulse/other.inertia * rB.cross(normal).z
 
-        return collision
+        return contact
 
     def collidesWithFloor(self) -> bool:
         if self.velocity.y < 0:
