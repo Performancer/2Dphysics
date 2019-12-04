@@ -87,26 +87,40 @@ class Polygon:
                            
         return False
 
+    def getDistance(self, point: vec.Vector, start: vec.Vector, end: vec.Vector) -> float:
+        sp = start - point #vector from point to start of line
+        n = (end - start).normalize() #normalized line
+        
+        #FORMULA: d = |(s-p) - ((s-p) dot n)n|
+        return (sp - n.scale(sp.dot(n))).magnitude()
+    
     def findCollision(self, other: 'Polygon') -> vec.Vector:
-        shortestD = (99999, vec.Vector(0,0,0), vec.Vector(0,0,0))
-        otherVerts = other.getVertices()
         selfVerts = self.getVertices()
+        otherVerts = other.getVertices()
+        
+        shortest = 99999
+        vertex = vec.Vector(0,0,0)
+        edge = vec.Vector(0,0,0)
         
         for i in range(0, len(selfVerts)):
-            for u in range(0, len(otherVerts)):
-                uNext = (u + 1) % len(otherVerts)
-                edge = otherVerts[uNext] - otherVerts[u]
+            for j in range(0, len(otherVerts)):
+                distance = self.getDistance(selfVerts[i], otherVerts[j], otherVerts[(j + 1) % len(otherVerts)])
                 
-                numerator = math.fabs((edge.x * (selfVerts[i].y - otherVerts[u].y)) - edge.y * (selfVerts[i].x - otherVerts[u].x))
-                denomirator = math.sqrt(edge.x**2 + edge.y**2)
-                distance = numerator/denomirator
-                
-                if(distance < shortestD[0]):
-                    shortestD = (distance, selfVerts[i], edge)
-                    
-        return (shortestD[1], shortestD[2])
+                if(distance < shortest):
+                    shortest = distance
+                    vertex = selfVerts[i]
+                    edge = otherVerts[(j + 1) % len(otherVerts)] - otherVerts[j]
 
-    def onCollision(self, other: 'Polygon'):
+                distance = self.getDistance(otherVerts[j], selfVerts[i], selfVerts[(i + 1) % len(selfVerts)])
+
+                if(distance < shortest):
+                    shortest = distance
+                    vertex = otherVerts[j]
+                    edge = selfVerts[(i + 1) % len(selfVerts)] - selfVerts[i]
+                              
+        return (vertex, edge)
+
+    def onCollision(self, other: 'Polygon') -> vec.Vector:
         data = self.findCollision(other)
         collision = data[0]
         edge = data[1]
@@ -125,3 +139,5 @@ class Polygon:
         
         other.velocity -= normal.scale(impulse/other.mass)
         other.angular -= impulse/other.inertia * rB.cross(normal).z
+
+        return collision
