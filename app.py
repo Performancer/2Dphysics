@@ -32,7 +32,8 @@ def animate(i, square, triangle):
     polygons[0].update(20 / 1000, 9.81)
     polygons[1].update(20 / 1000, 9.81)
 
-    print('Collision?: ' + str(polygons[0].collidesWithOtherPolygon(polygons[1])))
+    if polygons[0].collidesWithOtherPolygon(polygons[1]) and polygons[1].collidesWithOtherPolygon(polygons[0]):
+        print('collides')
 
     patches[0].set_xy(polygons[0].getVertices())
     patches[1].set_xy(polygons[1].getVertices())
