@@ -17,14 +17,14 @@ class Polygon:
         for i in range(0, count):
             self.vertices.append(vec.Vector(0, self.radius, 0).rotate(angle * i))
 
-    def getVertices(self) -> []:
+    def getVertexArray(self) -> []:
         result = []
         for i in range(0, len(self.vertices)):
             position = self.position + self.vertices[i].rotate(self.angle)
             result.append([position.x, position.y])
         return result
 
-    def getVerticesAsVec(self) -> []:
+    def getVertices(self) -> []:
         result = []
         for i in range(0, len(self.vertices)):
             position = self.vertices[i].rotate(self.angle) + (self.position)
@@ -43,8 +43,8 @@ class Polygon:
         return normal
         
     def collidesWithOtherPolygon(self, other: 'Polygon') -> bool:
-        selfVerts = self.getVerticesAsVec()
-        otherVerts = other.getVerticesAsVec()
+        selfVerts = self.getVertices()
+        otherVerts = other.getVertices()
         
         for i in range(0, len(selfVerts)):
             iNext = (i + 1) % len(selfVerts)
@@ -78,14 +78,52 @@ class Polygon:
         return True
 
     def collidesWithFloor(self) -> bool:
-        vertices = self.getVerticesAsVec()
+        vertices = self.getVertices()
         
         if self.velocity.y < 0:
             for i in range(0, len(vertices)):
                 if vertices[i].y < 0:
-                    return True;
+                    return True
                            
         return False
 
-    def onCollision(self):
-        return
+    def findClosest(self, other: 'Polygon') -> vec.Vector:
+        shortestD = (99999, vec.Vector(0,0,0), vec.Vector(0,0,0))
+        otherVerts = other.getVertices()
+        selfVerts = self.getVertices()
+        for i in range(0, len(selfVerts)):
+            for u in range(0, len(otherVerts)):
+                uNext = (u + 1) % len(selfVerts)
+                edge = otherVerts[uNext] - otherVerts[u]
+                numerator = math.fabs((edge.x * (selfVerts[i].y - otherVerts[u].y)) - edge.y * (selfVerts[i].x - otherVerts[u].x))
+                denomirator = math.sqrt(math.pow(edge.x, 2) + math.pow(edge.y, 2))
+                d = numerator/denomirator
+                if(d < shortestD[0]):
+                    shortestD = (d, selfVerts[i], otherVerts[uNext] - otherVerts[u])
+        return (shortestD[1], shortestD[2])
+
+    def onCollision(self, other: 'Polygon'):
+        #how to know which vertice has collide with which edge
+
+
+        collision = self.findClosest(other)[0]
+        edge = self.findClosest(other)[1]
+
+        #there are two possible normals, inside and outside
+        #how to determine the one that points outside?   
+        normal = vec.Vector(edge.y, -edge.x, 0).normalize()
+
+        rA = collision - self.position
+        rB = collision - other.position
+        VAB = self.velocity + (vec.Vector(0, 0, self.angular).cross(rA)) - other.velocity + (vec.Vector(0, 0, other.angular).cross(rB))
+
+        e = 1
+        I = -(e + 1) * (VAB.dot(normal)
+           / ( 1/self.mass + (rA.cross(normal).magnitude()**2)/self.inertia
+              + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inerta))
+
+        self.velocity += normal.scale(I/self.mass)
+        self.angular += I/self.inertia * rA.cross(normal).z
+        
+        other.velocity += normal.scale(I/other.mass)
+        other.angular += I/other.inerta * rB.cross(normal).z

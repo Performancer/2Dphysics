@@ -20,8 +20,8 @@ fig.set_size_inches(7, 6.5)
 ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
 patches = []
-patches.append(pyplot.Polygon(polygons[0].getVertices()))
-patches.append(pyplot.Polygon(polygons[1].getVertices()))
+patches.append(pyplot.Polygon(polygons[0].getVertexArray()))
+patches.append(pyplot.Polygon(polygons[1].getVertexArray()))
 
 def init():
     ax.add_patch(patches[0])
@@ -34,8 +34,8 @@ def animate(i, square, triangle):
 
     print('Collision?: ' + str(polygons[0].collidesWithOtherPolygon(polygons[1])))
 
-    patches[0].set_xy(polygons[0].getVertices())
-    patches[1].set_xy(polygons[1].getVertices())
+    patches[0].set_xy(polygons[0].getVertexArray())
+    patches[1].set_xy(polygons[1].getVertexArray())
     return []
 
 
