@@ -6,12 +6,12 @@ from matplotlib import animation
 
 polygons = []
 
-polygons.append(pol.Polygon(1, 0.5, 5, 2))
+polygons.append(pol.Polygon(1, 0.5, 2, 5))
 polygons[0].position = vec.Vector(2,5,0)
 polygons[0].velocity = vec.Vector(10,0,0)
 polygons[0].angle = 4
 
-polygons.append(pol.Polygon(2, 0.8, 4, 2))
+polygons.append(pol.Polygon(2, 0.8, 2, 3))
 polygons[1].position = vec.Vector(8,5,0)
 
 fig = pyplot.figure()
@@ -22,9 +22,15 @@ ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
 circle = pyplot.Circle((-1, -1), 0.1, color='r')
 
+def handleVertices(vertices):
+    handled = []
+    for i in range(0, len(vertices)):
+        handled.append([vertices[i].x, vertices[i].y])
+    return handled
+
 patches = []
-patches.append(pyplot.Polygon(polygons[0].getVertexArray()))
-patches.append(pyplot.Polygon(polygons[1].getVertexArray()))
+patches.append(pyplot.Polygon(handleVertices(polygons[0].getVertices())))
+patches.append(pyplot.Polygon(handleVertices(polygons[1].getVertices())))
 
 def init():
     ax.add_patch(patches[0])
@@ -36,12 +42,12 @@ def animate(i, circle, square, triangle):
     polygons[0].update(20 / 1000, 9.81)
     polygons[1].update(20 / 1000, 9.81)
 
-    if polygons[0].collidesWithOtherPolygon(polygons[1]) and polygons[1].collidesWithOtherPolygon(polygons[0]):
+    if polygons[0].collides(polygons[1]) and polygons[1].collides(polygons[0]):
         collision = polygons[0].onCollision(polygons[1])
         circle.center = (collision.x, collision.y)
 
-    patches[0].set_xy(polygons[0].getVertexArray())
-    patches[1].set_xy(polygons[1].getVertexArray())
+    patches[0].set_xy(handleVertices(polygons[0].getVertices()))
+    patches[1].set_xy(handleVertices(polygons[1].getVertices()))
     return []
 
 
