@@ -93,7 +93,7 @@ class Polygon:
         selfVerts = self.getVertices()
         for i in range(0, len(selfVerts)):
             for u in range(0, len(otherVerts)):
-                uNext = (u + 1) % len(selfVerts)
+                uNext = (u + 1) % len(otherVerts)
                 edge = otherVerts[uNext] - otherVerts[u]
                 numerator = math.fabs((edge.x * (selfVerts[i].y - otherVerts[u].y)) - edge.y * (selfVerts[i].x - otherVerts[u].x))
                 denomirator = math.sqrt(math.pow(edge.x, 2) + math.pow(edge.y, 2))
@@ -103,15 +103,11 @@ class Polygon:
         return (shortestD[1], shortestD[2])
 
     def onCollision(self, other: 'Polygon'):
-        #how to know which vertice has collide with which edge
+        data = self.findClosest(other)
+        collision = data[0]
+        edge = data[1]
 
-
-        collision = self.findClosest(other)[0]
-        edge = self.findClosest(other)[1]
-
-        #there are two possible normals, inside and outside
-        #how to determine the one that points outside?   
-        normal = vec.Vector(edge.y, -edge.x, 0).normalize()
+        normal = self.getNormal(edge)
 
         rA = collision - self.position
         rB = collision - other.position
@@ -120,10 +116,10 @@ class Polygon:
         e = 1
         I = -(e + 1) * (VAB.dot(normal)
            / ( 1/self.mass + (rA.cross(normal).magnitude()**2)/self.inertia
-              + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inerta))
+              + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inertia))
 
         self.velocity += normal.scale(I/self.mass)
         self.angular += I/self.inertia * rA.cross(normal).z
         
         other.velocity += normal.scale(I/other.mass)
-        other.angular += I/other.inerta * rB.cross(normal).z
+        other.angular += I/other.inertia * rB.cross(normal).z

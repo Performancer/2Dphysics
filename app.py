@@ -6,12 +6,14 @@ from matplotlib import animation
 
 polygons = []
 
-polygons.append(pol.Polygon(1, 0, 4, 2))
-polygons[0].position = vec.Vector(3,5,0)
-polygons[0].angular = 5
+polygons.append(pol.Polygon(1, 1, 4, 2))
+polygons[0].position = vec.Vector(2,5,0)
+polygons[0].velocity = vec.Vector(10,0,0)
+
+
 polygons.append(pol.Polygon(8, 1, 3, 2))
-polygons[1].position = vec.Vector(6,5,0)
-polygons[1].angular = -5
+polygons[1].position = vec.Vector(8,5,0)
+
 
 fig = pyplot.figure()
 fig.set_dpi(100)
@@ -33,7 +35,7 @@ def animate(i, square, triangle):
     polygons[1].update(20 / 1000, 9.81)
 
     if polygons[0].collidesWithOtherPolygon(polygons[1]) and polygons[1].collidesWithOtherPolygon(polygons[0]):
-        print('collides')
+        polygons[0].onCollision(polygons[1])
 
     patches[0].set_xy(polygons[0].getVertexArray())
     patches[1].set_xy(polygons[1].getVertexArray())
@@ -44,7 +46,7 @@ anim = animation.FuncAnimation(fig, animate,
                                init_func=init,
                                frames=1,
                                fargs=(patches[0], patches[1],),
-                               interval=1000,
+                               interval=20,
                                blit=True,
                                repeat=True)
 
