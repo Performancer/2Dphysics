@@ -56,11 +56,14 @@ class Polygon:
                 return False
         return True
 
+    def collidesWithFloor(self) -> bool:
+        vertices = self.getVerticesAsVec()
         
-            
-            
-
-    def collidesWithWall(self, wall) -> bool:
+        if self.velocity.y < 0:
+            for i in range(0, len(vertices)):
+                if vertices[i].y < 0:
+                    return True;
+                           
         return False
 
     def onCollision(self):
