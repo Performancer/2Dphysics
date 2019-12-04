@@ -70,9 +70,9 @@ class Polygon:
                 if length < oLowest:
                     oLowest = length
                 
-            if oHighest - oLowest > 0 and oLowest - sHighest > 0:
+            if oHighest - sLowest > 0 and oLowest - sHighest > 0:
                 return False
-            if oHighest - oLowest < 0 and oLowest - sHighest < 0:
+            if oHighest - sLowest < 0 and oLowest - sHighest < 0:
                 return False
                 
         return True
