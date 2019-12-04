@@ -36,24 +36,45 @@ class Polygon:
         self.position += self.velocity.scale(deltaTime)
         self.angle += self.angular * deltaTime
 
-    def CollidesWithOtherPolygon(self, other: 'Polygon') -> bool:
+    def getNormal(self, edge: vec.Vector) -> vec.Vector:
+        normal = vec.Vector(-edge.y, edge.x, 0).normalize()  
+        if edge.cross(normal).z > 0:
+            return normal.scale(-1.0)
+        return normal
+        
+    def collidesWithOtherPolygon(self, other: 'Polygon') -> bool:
         selfVerts = self.getVerticesAsVec()
         otherVerts = other.getVerticesAsVec()
-        largestSelfDot = -999999
-        #selfDots = []
+        
         for i in range(0, len(selfVerts)):
             iNext = (i + 1) % len(selfVerts)
-            edge = selfVerts[iNext] - selfVerts[i]
-            normal = vec.Vector(-edge.y, edge.x, 0).normalize()
-            if edge.cross(normal).z > 0:
-                normal.scale(-1)
-            if selfVerts[i].dot(normal) > largestSelfDot:
-                largestSelfDot = selfVerts[i].dot(normal)
-        for u in range(0, len(otherVerts)):
-            print(largestSelfDot)
-            print(otherVerts[u].dot(normal))
-            if largestSelfDot <= otherVerts[u].dot(normal):
+            normal = self.getNormal(selfVerts[iNext] - selfVerts[i])
+
+            sHighest = -90000
+            sLowest = 90000
+
+            for j in range(0, len(selfVerts)):
+                length = selfVerts[j].dot(normal)
+                if length > sHighest:
+                    sHighest = length
+                if length < sLowest:
+                    sLowest = length
+
+            oHighest = -90000
+            oLowest = 90000 
+
+            for j in range(0, len(otherVerts)):
+                length = otherVerts[j].dot(normal)
+                if length > oHighest:
+                    oHighest = length
+                if length < oLowest:
+                    oLowest = length
+                
+            if oHighest - oLowest > 0 and oLowest - sHighest > 0:
                 return False
+            if oHighest - oLowest < 0 and oLowest - sHighest < 0:
+                return False
+                
         return True
 
     def collidesWithFloor(self) -> bool:

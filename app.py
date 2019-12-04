@@ -9,11 +9,9 @@ polygons = []
 polygons.append(pol.Polygon(1, 0, 4, 2))
 polygons[0].position = vec.Vector(3,5,0)
 polygons[0].angular = 5
-polygons.append(pol.Polygon(3, 1, 4, 2))
-polygons[1].position = vec.Vector(7,5,0)
+polygons.append(pol.Polygon(8, 1, 3, 2))
+polygons[1].position = vec.Vector(6,5,0)
 polygons[1].angular = -5
-
-print('Collision?: ' + str(polygons[0].CollidesWithOtherPolygon(polygons[1])))
 
 fig = pyplot.figure()
 fig.set_dpi(100)
@@ -34,6 +32,8 @@ def animate(i, square, triangle):
     polygons[0].update(20 / 1000, 9.81)
     polygons[1].update(20 / 1000, 9.81)
 
+    print('Collision?: ' + str(polygons[0].collidesWithOtherPolygon(polygons[1])))
+
     patches[0].set_xy(polygons[0].getVertices())
     patches[1].set_xy(polygons[1].getVertices())
     return []
@@ -43,7 +43,7 @@ anim = animation.FuncAnimation(fig, animate,
                                init_func=init,
                                frames=1,
                                fargs=(patches[0], patches[1],),
-                               interval=20,
+                               interval=1000,
                                blit=True,
                                repeat=True)
 
