@@ -4,10 +4,11 @@ import lib.polygon as pol
 from matplotlib import pyplot
 from matplotlib import animation
 
-pola = pol.Polygon(1, 0, 8, 1)
-polb = pol.Polygon(3, 1, 4, 2)
+pola = pol.Polygon(1, 0, 4, 1)
+polb = pol.Polygon(3, 1, 4, 1)
+polb.position = vec.Vector(-4,-4,0)
 pola.position = vec.Vector(5,5,0)
-
+print('Collision?: ' + str(pola.CollidesWithOtherPolygon(polb)))
 fig = pyplot.figure()
 fig.set_dpi(100)
 fig.set_size_inches(7, 6.5)
@@ -27,7 +28,7 @@ def animate(i):
     patch.set_xy(pola.getVertices())
     return patch,
 
-pola.collidesWithOtherPolygon(polb)
+
 
 anim = animation.FuncAnimation(fig, animate, 
                                init_func=init, 
