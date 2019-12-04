@@ -20,14 +20,14 @@ class Polygon:
     def getVertices(self) -> []:
         result = []
         for i in range(0, len(self.vertices)):
-            position = self.vertices[i].rotate(self.angle).add(self.position)
+            position = self.position + self.vertices[i].rotate(self.angle)
             result.append([position.x, position.y])
         return result
 
     def update(self, deltaTime: float, gravity: float):
-        self.velocity = self.velocity.add(vec.Vector(0, -gravity * deltaTime, 0))
-        self.position = self.position.add(self.velocity.scale(deltaTime))
-        self.angle = self.angle + self.angular * deltaTime
+        self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
+        self.position += self.velocity.scale(deltaTime)
+        self.angle += self.angular * deltaTime
 
     def collidesWithOther(self, other: 'Polygon') -> bool:
         return False
