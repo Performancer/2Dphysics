@@ -4,6 +4,7 @@ import lib.polygon as pol
 from matplotlib import pyplot
 from matplotlib import animation
 
+#creating polygons
 polygons = []
 
 polygons.append(pol.Polygon(1, 2, 1, 5))
@@ -14,10 +15,13 @@ polygons[0].angle = 4
 polygons.append(pol.Polygon(1, 2, 1, 4))
 polygons[1].position = vec.Vector(8,5,0)
 
+polygons.append(pol.Polygon(1, 2, 1, 4))
+polygons[2].position = vec.Vector(4,2,0)
+
+#figure settings
 fig = pyplot.figure()
 fig.set_dpi(100)
 fig.set_size_inches(7, 6.5)
-
 ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
 def handleVertices(vertices):
@@ -27,17 +31,20 @@ def handleVertices(vertices):
     return handled
 
 patches = []
-patches.append(pyplot.Polygon(handleVertices(polygons[0].getVertices())))
-patches.append(pyplot.Polygon(handleVertices(polygons[1].getVertices())))
+
+for i in range(len(polygons)):
+    patches.append(pyplot.Polygon(handleVertices(polygons[i].getVertices())))
+
 contact = pyplot.Circle((-1, -1), 0.1, color='r')
 
 def init():
-    ax.add_patch(patches[0])
-    ax.add_patch(patches[1])
+    for i in range(len(patches)):
+        ax.add_patch(patches[i])
+        
     ax.add_patch(contact)
     return []
 
-def animate(i, contact, square, triangle):
+def animate(i, contact, patches):
     for pol in polygons:
         pol.update(20 / 1000, 9.81)
 
@@ -47,7 +54,7 @@ def animate(i, contact, square, triangle):
         for other in polygons:
             if other is not pol:
                 if pol.collides(other) and other.collides(pol):
-                    collision = polygons[0].onCollision(polygons[1])
+                    collision = pol.onCollision(other)
                     contact.center = (collision.x, collision.y)
 
     for i in range(len(patches)):
@@ -58,7 +65,7 @@ def animate(i, contact, square, triangle):
 anim = animation.FuncAnimation(fig, animate, 
                                init_func=init,
                                frames=1,
-                               fargs=(contact, patches[0], patches[1],),
+                               fargs=(contact, patches,),
                                interval=20,
                                blit=True,
                                repeat=True)
