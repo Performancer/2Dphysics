@@ -18,7 +18,7 @@ fig = pyplot.figure()
 fig.set_dpi(100)
 fig.set_size_inches(7, 6.5)
 
-ax = pyplot.axes(xlim=(-4, 14), ylim=(-4, 14))
+ax = pyplot.axes(xlim=(0, 10), ylim=(0, 10))
 
 def handleVertices(vertices):
     handled = []
@@ -39,17 +39,17 @@ def init():
 
 def animate(i, contact, square, triangle):
     for pol in polygons:
-        pol.update(10 / 1000, 9.81)
+        pol.update(20 / 1000, 9.81)
         for other in polygons:
             if other is not pol:
                 if pol.collides(other) and other.collides(pol):
                     collision = polygons[0].onCollision(polygons[1])
                     contact.center = (collision.x, collision.y)
 
-        if pol.collidesWithFloor(-2):
-            pol.onFloorCollision(-2)
-        if pol.collidesWithCeiling(12):
-            pol.onCeilingCollision(12)
+        if pol.collidesWithFloor(0):
+            pol.onFloorCollision(0)
+        if pol.collidesWithCeiling(10):
+            pol.onCeilingCollision(10)
         if pol.collidesWithLeftWall(0):
             pol.onLeftWallCollision(0)
         if pol.collidesWithRightWall(10):
@@ -64,7 +64,7 @@ anim = animation.FuncAnimation(fig, animate,
                                init_func=init,
                                frames=1,
                                fargs=(contact, patches[0], patches[1],),
-                               interval=10,
+                               interval=20,
                                blit=True,
                                repeat=True)
 
