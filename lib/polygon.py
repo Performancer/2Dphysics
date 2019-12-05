@@ -34,6 +34,7 @@ class Polygon:
     #handles the acceleration, velocity, angular velocity
     def update(self, deltaTime: float, gravity: float):
         self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
+        self.velocity = self.velocity.scale(0.99)
         self.position += self.velocity.scale(deltaTime)
         self.angle += self.angular * deltaTime
 
@@ -121,85 +122,45 @@ class Polygon:
 
         return contact
 
-    def collidesWithFloor(self, floorPosY) -> bool:
+    def collidesWithBorder(self, floorY:float, ceilingY:float, leftWallX:float, rightWallX:float):
         if self.velocity.y < 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y < floorPosY:
+                if self.getVertex(i).y < floorY:
                     return True
-                           
-        return False
-
-    def onFloorCollision(self, floorPosY: float):
-        for i in range(0, len(self.vertices)):
-            if self.getVertex(i).y < floorPosY:
-                contact = self.getVertex(i)
-        rP = contact - self.position
-        normal = vec.Vector(0, 1, 0)
-        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.8
-        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
-        
-        self.velocity = self.velocity + normal.scale(impulse/self.mass)
-        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
-
-    def collidesWithCeiling(self, ceilingPosY) -> bool:
-        if self.velocity.y > 0:
+        else:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y > ceilingPosY:
+                if self.getVertex(i).y > ceilingY:
                     return True
-                           
-        return False
-
-    def onCeilingCollision(self, ceilingPosY: float):
-        for i in range(0, len(self.vertices)):
-            if self.getVertex(i).y > ceilingPosY:
-                contact = self.getVertex(i)
-        rP = contact - self.position
-        normal = vec.Vector(0, -1, 0)
-        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.8
-        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
-        
-        self.velocity = self.velocity + normal.scale(impulse/self.mass)
-        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
-
-    def collidesWithLeftWall(self, wallPosX) -> bool:
         if self.velocity.x < 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x < wallPosX:
+                if self.getVertex(i).x < leftWallX:
                     return True
-                           
-        return False
-
-    def onLeftWallCollision(self, wallPosX: float):
-        for i in range(0, len(self.vertices)):
-            if self.getVertex(i).x < wallPosX:
-                contact = self.getVertex(i)
-        rP = contact - self.position
-        normal = vec.Vector(1, 0, 0)
-        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.8
-        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
-        
-        self.velocity = self.velocity + normal.scale(impulse/self.mass)
-        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
-
-    def collidesWithRightWall(self, wallPosX) -> bool:
-        if self.velocity.x > 0:
+        else:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x > wallPosX:
+                if self.getVertex(i).x > rightWallX:
                     return True
                            
         return False
 
-    def onRightWallCollision(self, wallPosX: float):
+    def onBorderCollision(self, floorY:float, ceilingY:float, leftWallX:float, rightWallX:float):
+        
         for i in range(0, len(self.vertices)):
-            if self.getVertex(i).x > wallPosX:
+            if self.getVertex(i).y < floorY:
                 contact = self.getVertex(i)
+                normal = vec.Vector(0, 1, 0)
+            if self.getVertex(i).y > ceilingY:
+                contact = self.getVertex(i)
+                normal = vec.Vector(0, -1, 0)
+            if self.getVertex(i).x < leftWallX:
+                contact = self.getVertex(i)
+                normal = vec.Vector(1, 0, 0)
+            if self.getVertex(i).x > rightWallX:
+                contact = self.getVertex(i)
+                normal = vec.Vector(-1, 0, 0)
+            
         rP = contact - self.position
-        normal = vec.Vector(-1, 0, 0)
         vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.8
+        e = 0.7
         impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
         
         self.velocity = self.velocity + normal.scale(impulse/self.mass)
