@@ -84,5 +84,5 @@ def animate(i, contact, patches):
         patches[i].set_xy(handleVertices(polygons[i].getVertices()))
     return []
 
-anim = animation.FuncAnimation(fig, animate, init_func=init, frames=30, fargs=(contact, patches,), interval=1)
+anim = animation.FuncAnimation(fig, animate, init_func=init, frames=30, fargs=(contact, patches,), interval=20)
 pyplot.show()
