@@ -9,12 +9,11 @@ polygons = []
 
 polygons.append(pol.Polygon(1, 2, 1, 5))
 polygons[0].position = vec.Vector(2,5,0)
-polygons[0].velocity = vec.Vector(12,4,0)
+polygons[0].velocity = vec.Vector(12,0,0)
 polygons[0].angle = 4
 
 polygons.append(pol.Polygon(1, 2, 1, 4))
 polygons[1].position = vec.Vector(8,5,0)
-polygons[1].velocity = vec.Vector(-1,3,0)
 
 polygons.append(pol.Polygon(1, 2, 1, 4))
 polygons[2].position = vec.Vector(4,2,0)

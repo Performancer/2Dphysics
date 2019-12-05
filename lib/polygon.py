@@ -34,8 +34,10 @@ class Polygon:
 
     #handles the acceleration, velocity, angular velocity
     def update(self, deltaTime: float, gravity: float):
-        self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
-        self.velocity = self.velocity - self.velocity.normalize().scale(0.5 * (self.velocity.magnitude() + 0.001)**2 * 0.4 * (2*self.radius)**2 * 1.204 * deltaTime/self.mass)
+        if self.position.y - self.radius > 0:
+            self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
+            
+        #self.velocity = self.velocity - self.velocity.normalize().scale(0.5 * (self.velocity.magnitude() + 0.001)**2 * 0.4 * (2*self.radius)**2 * 1.204 * deltaTime/self.mass)
         self.position += self.velocity.scale(deltaTime)
         self.angle += self.angular * deltaTime
 
@@ -140,46 +142,53 @@ class Polygon:
         return contact
 
     # collision between polygon and border
-    def collidesWithBorder(self, bottomBorderY:float, topBorderY:float, leftBorderX:float, rightBorderX:float):
-        if self.position.y - self.radius < bottomBorderY and self.velocity.y < 0:
-            for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y < bottomBorderY:
+    def collidesWithBorder(self, bottom: float, top: float, left: float, right: float):
+        if self.position.y - self.radius < bottom and self.velocity.y < 0:
+            for i in range(len(self.vertices)):
+                if self.getVertex(i).y < bottom:
                     return True
-        if self.position.y + self.radius > topBorderY and self.velocity.y > 0:
+        if self.position.y + self.radius > top and self.velocity.y > 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y > topBorderY:
+                if self.getVertex(i).y > top:
                     return True
-        if self.position.x - self.radius < leftBorderX and self.velocity.x < 0:
+        if self.position.x - self.radius < left and self.velocity.x < 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x < leftBorderX:
+                if self.getVertex(i).x < left:
                     return True
-        if self.position.x + self.radius > rightBorderX and self.velocity.x > 0:
+        if self.position.x + self.radius > right and self.velocity.x > 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x > rightBorderX:
+                if self.getVertex(i).x > right:
                     return True
                            
         return False
 
-    def onBorderCollision(self, bottomBorderY:float, topBorderY:float, leftBorderX:float, rightBorderX:float):
+    def onBorderCollision(self, bottom: float, top: float, left: float, right: float):
         
-        for i in range(0, len(self.vertices)):
-            if self.getVertex(i).y < bottomBorderY:
-                contact = self.getVertex(i)
-                normal = vec.Vector(0, 1, 0)
-            if self.getVertex(i).y > topBorderY:
-                contact = self.getVertex(i)
-                normal = vec.Vector(0, -1, 0)
-            if self.getVertex(i).x < leftBorderX:
-                contact = self.getVertex(i)
-                normal = vec.Vector(1, 0, 0)
-            if self.getVertex(i).x > rightBorderX:
-                contact = self.getVertex(i)
-                normal = vec.Vector(-1, 0, 0)
-            
+        for i in range(len(self.vertices)):
+            if self.getVertex(i).y < bottom and self.velocity.y < 0:
+                self.calsu(self.getVertex(i), vec.Vector(0, 1, 0))
+                return
+                
+            if self.getVertex(i).y > top and self.velocity.y > 0:
+                self.calsu(self.getVertex(i), vec.Vector(0, -1, 0))
+                return
+                
+            if self.getVertex(i).x < left and self.velocity.x < 0:
+                self.calsu(self.getVertex(i), vec.Vector(1, 0, 0))
+                return
+                
+            if self.getVertex(i).x > right and self.velocity.x > 0:
+                self.calsu(self.getVertex(i), vec.Vector(-1, 0, 0))
+                return
+
+
+    def calsu(self, contact: vec.Vector, normal: vec.Vector):
+        #distance from center of mass to the collision contact
         rP = contact - self.position
-        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.4
-        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
+        #vertex velocity before the collision
+        velocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.8 #maybe this could be parameter
+        impulse = -(e + 1) * (velocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
         
-        self.velocity = self.velocity + normal.scale(impulse/self.mass)
-        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
+        self.velocity += normal.scale(impulse/self.mass)
+        self.angular += rP.cross(normal).scale(impulse/self.inertia).z
