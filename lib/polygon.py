@@ -8,6 +8,7 @@ class Polygon:
         self.inertia = inertia
         self.position = vec.Vector(0,0,0)
         self.velocity = vec.Vector(0,0,0)
+        self.radius = radius
         self.angle = 0
         self.angular = 0
                  
@@ -34,7 +35,7 @@ class Polygon:
     #handles the acceleration, velocity, angular velocity
     def update(self, deltaTime: float, gravity: float):
         self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
-        self.velocity = self.velocity.scale(0.99)
+        self.velocity = self.velocity - self.velocity.normalize().scale(0.5 * (self.velocity.magnitude() + 0.001)**2 * 0.4 * (2*self.radius)**2 * 1.204 * deltaTime/self.mass)
         self.position += self.velocity.scale(deltaTime)
         self.angle += self.angular * deltaTime
 
@@ -74,26 +75,11 @@ class Polygon:
         return True
 
     #gets the distance from a point to a line
-    def getDistance(self, point: vec.Vector, start: vec.Vector, end: vec.Vector) -> float:
-        edge = end - start
-        
-        a = point - start
-        b = edge.normalize()
-
-        #FORMULA: a1 = (a dot b)b
-        projection = b.scale(a.dot(b))
-        #FORMULA: a2 = a - a1
-        rejection = a - projection
-
-        #the projection is to opposite direction than the edge, hypotenuse of projection and rejection is the distance
-        if projection.dot(b) < 0:
-            return vec.Vector(projection.magnitude(), rejection.magnitude(), 0).magnitude()
-        #the projection is to the same direction but longer than the edge, hypotenuse of projection - edge and rejection is the distance
-        if projection.magnitude() > edge.magnitude():
-            return vec.Vector(projection.magnitude() - edge.magnitude(), rejection.magnitude(), 0).magnitude()
-
-        #projection is to the same direction and does not exceed edge, rejection is the distance
-        return rejection.magnitude()
+    def getDistance(self, point: vec.Vector, start: vec.Vector, line: vec.Vector) -> float:
+        sp = start - point
+        n = line.normalize()    
+        #FORMULA: d = |(s-p) - ((s-p) dot n)n|
+        return (sp - n.scale(sp.dot(n))).magnitude()
 
     #gets the vertice and the edge of the collision contact point
     def findCollision(self, other: 'Polygon') -> vec.Vector:
@@ -101,12 +87,11 @@ class Polygon:
         
         for i in range(0, len(self.vertices)):
             start = self.getVertex(i)
-            end = self.getVertex((i+1) % len(self.vertices))
-            edge = end - start
+            edge = self.getVertex((i+1) % len(self.vertices)) - start
             for j in range(0, len(other.vertices)):
                 vertex = other.getVertex(j)
-                distance = self.getDistance(vertex, start, end)
-
+                distance = self.getDistance(vertex, start, edge)
+                
                 if(distance < data['distance']):
                     data = {'distance': distance, 'vertex': vertex, 'edge': edge}
                               
@@ -138,45 +123,46 @@ class Polygon:
 
         return contact
 
-    def collidesWithBorder(self, floorY:float, ceilingY:float, leftWallX:float, rightWallX:float):
-        if self.velocity.y < 0:
+    # collision between polygon and border
+    def collidesWithBorder(self, bottomBorderY:float, topBorderY:float, leftBorderX:float, rightBorderX:float):
+        if self.position.y - self.radius < bottomBorderY and self.velocity.y < 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y < floorY:
+                if self.getVertex(i).y < bottomBorderY:
                     return True
-        else:
+        if self.position.y + self.radius > topBorderY and self.velocity.y > 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).y > ceilingY:
+                if self.getVertex(i).y > topBorderY:
                     return True
-        if self.velocity.x < 0:
+        if self.position.x - self.radius < leftBorderX and self.velocity.x < 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x < leftWallX:
+                if self.getVertex(i).x < leftBorderX:
                     return True
-        else:
+        if self.position.x + self.radius > rightBorderX and self.velocity.x > 0:
             for i in range(0, len(self.vertices)):
-                if self.getVertex(i).x > rightWallX:
+                if self.getVertex(i).x > rightBorderX:
                     return True
                            
         return False
 
-    def onBorderCollision(self, floorY:float, ceilingY:float, leftWallX:float, rightWallX:float):
+    def onBorderCollision(self, bottomBorderY:float, topBorderY:float, leftBorderX:float, rightBorderX:float):
         
         for i in range(0, len(self.vertices)):
-            if self.getVertex(i).y < floorY:
+            if self.getVertex(i).y < bottomBorderY:
                 contact = self.getVertex(i)
                 normal = vec.Vector(0, 1, 0)
-            if self.getVertex(i).y > ceilingY:
+            if self.getVertex(i).y > topBorderY:
                 contact = self.getVertex(i)
                 normal = vec.Vector(0, -1, 0)
-            if self.getVertex(i).x < leftWallX:
+            if self.getVertex(i).x < leftBorderX:
                 contact = self.getVertex(i)
                 normal = vec.Vector(1, 0, 0)
-            if self.getVertex(i).x > rightWallX:
+            if self.getVertex(i).x > rightBorderX:
                 contact = self.getVertex(i)
                 normal = vec.Vector(-1, 0, 0)
             
         rP = contact - self.position
         vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-        e = 0.7
+        e = 0.4
         impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
         
         self.velocity = self.velocity + normal.scale(impulse/self.mass)
