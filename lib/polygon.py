@@ -121,10 +121,86 @@ class Polygon:
 
         return contact
 
-    def collidesWithFloor(self) -> bool:
+    def collidesWithFloor(self, floorPosY) -> bool:
         if self.velocity.y < 0:
-            for i in range(0, len(vertices)):
-                if self.getVertex(i).y < 0:
+            for i in range(0, len(self.vertices)):
+                if self.getVertex(i).y < floorPosY:
                     return True
                            
         return False
+
+    def onFloorCollision(self, floorPosY: float):
+        for i in range(0, len(self.vertices)):
+            if self.getVertex(i).y < floorPosY:
+                contact = self.getVertex(i)
+        rP = contact - self.position
+        normal = vec.Vector(0, 1, 0)
+        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.8
+        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
+        
+        self.velocity = self.velocity + normal.scale(impulse/self.mass)
+        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
+
+    def collidesWithCeiling(self, ceilingPosY) -> bool:
+        if self.velocity.y > 0:
+            for i in range(0, len(self.vertices)):
+                if self.getVertex(i).y > ceilingPosY:
+                    return True
+                           
+        return False
+
+    def onCeilingCollision(self, ceilingPosY: float):
+        for i in range(0, len(self.vertices)):
+            if self.getVertex(i).y > ceilingPosY:
+                contact = self.getVertex(i)
+        rP = contact - self.position
+        normal = vec.Vector(0, -1, 0)
+        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.8
+        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
+        
+        self.velocity = self.velocity + normal.scale(impulse/self.mass)
+        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
+
+    def collidesWithLeftWall(self, wallPosX) -> bool:
+        if self.velocity.x < 0:
+            for i in range(0, len(self.vertices)):
+                if self.getVertex(i).x < wallPosX:
+                    return True
+                           
+        return False
+
+    def onLeftWallCollision(self, wallPosX: float):
+        for i in range(0, len(self.vertices)):
+            if self.getVertex(i).x < wallPosX:
+                contact = self.getVertex(i)
+        rP = contact - self.position
+        normal = vec.Vector(1, 0, 0)
+        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.8
+        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
+        
+        self.velocity = self.velocity + normal.scale(impulse/self.mass)
+        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
+
+    def collidesWithRightWall(self, wallPosX) -> bool:
+        if self.velocity.x > 0:
+            for i in range(0, len(self.vertices)):
+                if self.getVertex(i).x > wallPosX:
+                    return True
+                           
+        return False
+
+    def onRightWallCollision(self, wallPosX: float):
+        for i in range(0, len(self.vertices)):
+            if self.getVertex(i).x > wallPosX:
+                contact = self.getVertex(i)
+        rP = contact - self.position
+        normal = vec.Vector(-1, 0, 0)
+        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.8
+        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
+        
+        self.velocity = self.velocity + normal.scale(impulse/self.mass)
+        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
