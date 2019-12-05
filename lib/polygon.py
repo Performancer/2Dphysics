@@ -145,28 +145,25 @@ class Polygon:
         return False
 
     def onBorderCollision(self, bottomBorderY:float, topBorderY:float, leftBorderX:float, rightBorderX:float):
-        contacts = []
+        
         for i in range(0, len(self.vertices)):
             if self.getVertex(i).y < bottomBorderY:
-                contacts.append(self.getVertex(i))
+                contact = self.getVertex(i)
                 normal = vec.Vector(0, 1, 0)
             if self.getVertex(i).y > topBorderY:
-                contacts.append(self.getVertex(i))
+                contact = self.getVertex(i)
                 normal = vec.Vector(0, -1, 0)
             if self.getVertex(i).x < leftBorderX:
-                contacts.append(self.getVertex(i))
+                contact = self.getVertex(i)
                 normal = vec.Vector(1, 0, 0)
             if self.getVertex(i).x > rightBorderX:
-                contacts.append(self.getVertex(i))
+                contact = self.getVertex(i)
                 normal = vec.Vector(-1, 0, 0)
+            
+        rP = contact - self.position
+        vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
+        e = 0.4
+        impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
         
-        if len(contacts) == 1:
-            rP = contacts[0] - self.position
-            vertexVelocity = self.velocity + (vec.Vector(0, 0, self.angular).cross(rP))
-            e = 0.4
-            impulse = -(e + 1) * (vertexVelocity.dot(normal) / ( 1/self.mass + (rP.cross(normal).magnitude()**2)/self.inertia ))
-
-            self.velocity = self.velocity + normal.scale(impulse/self.mass)
-            self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
-        else:
-            self.angular = 0
+        self.velocity = self.velocity + normal.scale(impulse/self.mass)
+        self.angular = self.angular + rP.cross(normal).scale(impulse/self.inertia).magnitude()
