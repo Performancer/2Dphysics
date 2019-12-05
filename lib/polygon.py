@@ -74,11 +74,26 @@ class Polygon:
         return True
 
     #gets the distance from a point to a line
-    def getDistance(self, point: vec.Vector, start: vec.Vector, line: vec.Vector) -> float:
-        sp = start - point
-        n = line.normalize()    
-        #FORMULA: d = |(s-p) - ((s-p) dot n)n|
-        return (sp - n.scale(sp.dot(n))).magnitude()
+    def getDistance(self, point: vec.Vector, start: vec.Vector, end: vec.Vector) -> float:
+        edge = end - start
+        
+        a = point - start
+        b = edge.normalize()
+
+        #FORMULA: a1 = (a dot b)b
+        projection = b.scale(a.dot(b))
+        #FORMULA: a2 = a - a1
+        rejection = a - projection
+
+        #the projection is to opposite direction than the edge, hypotenuse of projection and rejection is the distance
+        if projection.dot(b) < 0:
+            return vec.Vector(projection.magnitude(), rejection.magnitude(), 0).magnitude()
+        #the projection is to the same direction but longer than the edge, hypotenuse of projection - edge and rejection is the distance
+        if projection.magnitude() > edge.magnitude():
+            return vec.Vector(projection.magnitude() - edge.magnitude(), rejection.magnitude(), 0).magnitude()
+
+        #projection is to the same direction and does not exceed edge, rejection is the distance
+        return rejection.magnitude()
 
     #gets the vertice and the edge of the collision contact point
     def findCollision(self, other: 'Polygon') -> vec.Vector:
@@ -86,11 +101,12 @@ class Polygon:
         
         for i in range(0, len(self.vertices)):
             start = self.getVertex(i)
-            edge = self.getVertex((i+1) % len(self.vertices)) - start
+            end = self.getVertex((i+1) % len(self.vertices))
+            edge = end - start
             for j in range(0, len(other.vertices)):
                 vertex = other.getVertex(j)
-                distance = self.getDistance(vertex, start, edge)
-                
+                distance = self.getDistance(vertex, start, end)
+
                 if(distance < data['distance']):
                     data = {'distance': distance, 'vertex': vertex, 'edge': edge}
                               

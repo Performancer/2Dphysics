@@ -6,12 +6,12 @@ from matplotlib import animation
 
 polygons = []
 
-polygons.append(pol.Polygon(1, 2, 1, 7))
+polygons.append(pol.Polygon(1, 2, 1, 5))
 polygons[0].position = vec.Vector(2,5,0)
 polygons[0].velocity = vec.Vector(12,0,0)
 polygons[0].angle = 4
 
-polygons.append(pol.Polygon(1, 2, 1, 7))
+polygons.append(pol.Polygon(1, 2, 1, 4))
 polygons[1].position = vec.Vector(8,5,0)
 
 fig = pyplot.figure()
@@ -40,25 +40,16 @@ def init():
 def animate(i, contact, square, triangle):
     for pol in polygons:
         pol.update(20 / 1000, 9.81)
+
+        if pol.collidesWithBorder(0, 10, 0, 10):
+            pol.onBorderCollision(0, 10, 0, 10)
+        
         for other in polygons:
             if other is not pol:
                 if pol.collides(other) and other.collides(pol):
                     collision = polygons[0].onCollision(polygons[1])
                     contact.center = (collision.x, collision.y)
 
-        if pol.collidesWithBorder(0, 10, 0, 10):
-            pol.onBorderCollision(0, 10, 0, 10)
-
-        '''
-        if pol.collidesWithFloor(0):
-            pol.onFloorCollision(0)
-        if pol.collidesWithCeiling(10):
-            pol.onCeilingCollision(10)
-        if pol.collidesWithLeftWall(0):
-            pol.onLeftWallCollision(0)
-        if pol.collidesWithRightWall(10):
-            pol.onRightWallCollision(10)
-        '''
     for i in range(len(patches)):
         patches[i].set_xy(handleVertices(polygons[i].getVertices()))
     return []
@@ -68,7 +59,7 @@ anim = animation.FuncAnimation(fig, animate,
                                init_func=init,
                                frames=1,
                                fargs=(contact, patches[0], patches[1],),
-                               interval=10,
+                               interval=20,
                                blit=True,
                                repeat=True)
 
