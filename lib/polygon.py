@@ -167,19 +167,18 @@ class Polygon:
         for i in range(len(self.vertices)):
             if self.getVertex(i).y < bottom and self.velocity.y < 0:
                 self.calsu(self.getVertex(i), vec.Vector(0, 1, 0))
-                return
-                
+                break
             if self.getVertex(i).y > top and self.velocity.y > 0:
                 self.calsu(self.getVertex(i), vec.Vector(0, -1, 0))
-                return
-                
+                break
+
+        for i in range(len(self.vertices)):
             if self.getVertex(i).x < left and self.velocity.x < 0:
                 self.calsu(self.getVertex(i), vec.Vector(1, 0, 0))
-                return
-                
+                break      
             if self.getVertex(i).x > right and self.velocity.x > 0:
                 self.calsu(self.getVertex(i), vec.Vector(-1, 0, 0))
-                return
+                break
 
 
     def calsu(self, contact: vec.Vector, normal: vec.Vector):
