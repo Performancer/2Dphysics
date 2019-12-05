@@ -34,10 +34,14 @@ class Polygon:
 
     #handles the acceleration, velocity, angular velocity
     def update(self, deltaTime: float, gravity: float):
+
+        #the polygon is on the ground so it will not accelerate downwards
         if self.position.y - self.radius > 0:
             self.velocity += vec.Vector(0, -gravity * deltaTime, 0)
-            
-        #self.velocity = self.velocity - self.velocity.normalize().scale(0.5 * (self.velocity.magnitude() + 0.001)**2 * 0.4 * (2*self.radius)**2 * 1.204 * deltaTime/self.mass)
+
+        #subtract drag from the velocity
+        self.velocity -= self.velocity.scale(0.005 * self.velocity.magnitude())
+        
         self.position += self.velocity.scale(deltaTime)
         self.angle += self.angular * deltaTime
 
