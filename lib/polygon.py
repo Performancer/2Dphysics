@@ -132,7 +132,7 @@ class Polygon:
         
         rA = contact - self.position
         rB = contact - other.position
-        VAB = self.velocity + (vec.Vector(0, 0, self.angular).cross(rA)) - other.velocity + (vec.Vector(0, 0, other.angular).cross(rB))
+        VAB = self.velocity + (vec.Vector(0, 0, self.angular).cross(rA)) - (other.velocity + (vec.Vector(0, 0, other.angular).cross(rB)))
 
         e = 0.8 #maybe this could be parameter
         impulse = -(e + 1) * (VAB.dot(normal) / ( 1/self.mass + (rA.cross(normal).magnitude()**2)/self.inertia + 1/other.mass + (rB.cross(normal).magnitude()**2)/other.inertia))
